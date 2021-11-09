@@ -1,34 +1,41 @@
 # GAEZ-_2015_code
-Code used to generated the GAEZ+_2015 data products
-Data products are available for download here:
-Grogan, D., Prusevich, A., Frolking, S., Wisser, D., Glidden, S. (2021), GAEZ+_2015 Monthly Cropland Data: Global gridded monthly crop physical area for 26 irrigated and rainfed crops, DOI: 10.13019/J2BH-VB41, MyGeoHub.
+This repository contains the code used for data input preparation and model output analysis for the paper: Grogan D.S., Frolking S., Wisser D., Prusevich A., Glidden S. (2021, accepted) Global gridded crop harvested area, production, yield, and monthly physical area data circa 2015. Scientific Data (doi XXXX). 
 
-GAEZ_crops.pl
-This perl script executes the algorithm comprising "Step 6" in the paper Grogan et al 2021 (Global gridded crop harvest, production, yield, and monthly physical area data circa 2015):
+Data products analyzed in the paper and by this repository's code are available for download here:
 
-Step 6. Apply MIRCA2000 monthly crop calendars to GAEZ+ 2015 annual data
+Frolking, S., Wisser, D., Grogan, D., Proussevitch, A. & Glidden, S. GAEZ+_2015 Crop Harvest Area. Harvard Dataverse https://doi.org/10.7910/DVN/KAGRFI (2020).
 
-To generate the monthly cropland area of GAEZ+ 2015 crops, we followed these steps for each GAEZ crop in each grid cell:
+Frolking, S., Wisser, D., Grogan, D., Proussevitch, A. & Glidden, S. GAEZ+_2015 Crop Yield. Harvard Dataverse https://doi.org/10.7910/DVN/XGGJAV (2020).
 
-1. For a given GAEZ crop in a given grid cell, is the area reported >0 for the matching MIRCA2000 crop?
-	If YES, then use the MIRCA2000 data for the grid cell and crop considered
-	If NO, then find the closest grid cell with the matching MIRCA200 crop category, and apply the MIRCA2000 crop rotation from that grid cell to the given crop/grid cell combination for the following steps. 
+Frolking, S., Wisser, D., Grogan, D., Proussevitch, A. & Glidden, S. GAEZ+_2015 Crop Production. Harvard Dataverse https://doi.org/10.7910/DVN/KJFUO1 (2020).
 
-2. Does the matching MIRCA2000 crop category (Table 1) have more than 1 subcrop?
-	If NO, then AG = HG for all months of the cropping season, as defined by the MIRCA2000 crop calendar. 
-	If YES, then for each subcrop category n, apply the ratio of AM,n/HM to HG, then sum the subcrop areas within each month such that:
-A_G= ∑_n▒〖A_(M,n)/H_M  H_G 〗  
+Grogan, D., Prusevich, A., Frolking, S., Wisser, D. & Glidden, S. GAEZ+_2015 Monthly Cropland Data: Global gridded monthly crop physical area for 26 irrigated and rainfed crops. MyGeoHub https://doi.org/10.13019/J2BH-VB41 (2021).
 
-3. For each month and each grid cell, check if the sum of all crops (irrigated and rainfed) is greater than the 99 % of area of the grid cell. We assume that at least 1 % of land must be retained as non-cropland for agricultural infrastructure such as roads, buildings, irrigation equipment, and other landcovers (e.g. rivers, wetlands).  
-	If NO, then no further processing is done.
-	If YES, then reduce crop area by the excess value based on a priority order (Table 2) Rainfed crops have higher priority order for the excess truncation (starting with 1) before removing irrigated crops, until the cell area is not exceeded. A large priority number (e.g., 20) indicates a low priority, such that the crop’s land is unlikely to be removed. Large priority numbers are given to the staple crops to ensure these important food producing lands are consistent with FAOSTAT country data.
+## GAEZ_crops.pl 
 
+This perl script executes the algorithm comprising "Step 6" in the paper, which applies the MIRCA2000 monthly crop calendars to the GAEZ+ 2015 annual cropland harvest area data 
 
-watershed_regions.pl
-This perl script aggregates the Hydrosheds 5-minute river network into 20-200 km2 basins.  These basins are used for validation by cropland_spacialAgg_validation_PUB.R
+## watershed_regions.pl
 
+This perl script aggregates the Hydrosheds 5-minute river network into smaller basins of the size 20-200 km2.  These basins are used for validation by cropland_validation_HYDE_PUB.R, with results appearing in Table 6 and Figures 7 and 8.
 
-harvest_area_validation_PUB.R
+## harvest_area_comparison_PUB.R
+
+This R code compares the GAEZ+ 2015 harvest area to FAOSTAT 2015 harvest area statistics by country.  This code produces Tables 3 and 4.
+
+## yield_comparison_PUB.R
+
+This R code compares GAEZ+ 2015 crop yield for maize, rice, soybean, and wheat to the GDHY data product. This code produces Figures 3 and 4.
+
+## cropland_validation_HYDE_PUB.R
+
+This R code compares GAEZ+ 2015 physical cropland area to the HYDE v2.3 data product's cropland area.  This code produces the results shown in Table 6 and Figures 7 and 8.
+
+## cropland_validation_MapSPAM_PUB.R
+
+This R code compares GAEZ 2010 cropland extent to the MapSPAM data product, and produces Figure 10.
+
+## harvest_area_validation_PUB.R
 This R script compares year 2010 crop harvest area as generated by GAEZ_2010 to the FAOSTAT-reported crop harvest area. Results produce Table 3 and Table 4 in Grogan et al 2021 publication
 
 cropland_spacialAgg_validation_PUB.R
